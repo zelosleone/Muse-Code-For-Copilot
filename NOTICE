@@ -1,0 +1,3 @@
+The Meta sign-in parameters (client id and endpoints) follow the published behavior of
+oh-my-pi (https://github.com/can1357/oh-my-pi, MIT) and opencode-muse-auth
+(https://github.com/TheStreamCode/opencode-muse-auth, MIT). No code from either project is included.
