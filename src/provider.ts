@@ -118,6 +118,19 @@ export class MuseChatProvider implements vscode.LanguageModelChatProvider<MuseMo
   }
 }
 
+// The picked effort if the model still offers it live, else its default; 'auto' sends nothing.
+function reasoningEffort(model: MuseModel, options: Options): string | undefined {
+  const schema = model.configurationSchema?.properties.reasoningEffort;
+  if (!schema) return undefined;
+  const configured = configuredEffort(options);
+  const value = configured !== undefined && schema.enum.includes(configured) ? configured : schema.default;
+  return value === 'auto' ? undefined : value;
+}
+
+function configuredEffort(options: Options): string | undefined {
+  return options.modelConfiguration?.reasoningEffort ?? options.configuration?.reasoningEffort;
+}
+
 function buildRequest(model: MuseModel, messages: readonly vscode.LanguageModelChatRequestMessage[], options: Options) {
   const tools = (options.tools ?? []).map(toOpenAITool);
   return {
@@ -126,7 +139,7 @@ function buildRequest(model: MuseModel, messages: readonly vscode.LanguageModelC
     stream: true,
     stream_options: { include_usage: true },
     prompt_cache_key: `muse-code-copilot:${model.id}`,
-    reasoning_effort: options.modelConfiguration?.reasoningEffort ?? options.configuration?.reasoningEffort,
+    reasoning_effort: reasoningEffort(model, options),
     // Meta rejects any tool_choice other than "auto".
     ...(tools.length > 0 ? { tools, tool_choice: 'auto' } : {}),
   };

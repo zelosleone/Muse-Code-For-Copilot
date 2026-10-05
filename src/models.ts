@@ -1,10 +1,14 @@
 import type * as vscode from 'vscode';
 import type { ApiModel, MuseMeta } from './meta.js';
 
+interface EffortSchema {
+  properties: { reasoningEffort: { enum: string[]; default: string } & Record<string, unknown> };
+}
+
 export type MuseModel = vscode.LanguageModelChatInformation & {
   readonly isBYOK: true;
   readonly maxContextWindowTokens: number;
-  readonly configurationSchema?: object;
+  readonly configurationSchema?: EffortSchema;
 };
 
 type UsableMeta = MuseMeta & { limit: { context: number; output: number } };
@@ -22,9 +26,7 @@ function toMuseModel({ id, metadata }: ApiModel): MuseModel[] {
       name: titleCase(id),
       family: id.split('-').slice(0, 2).join('-'),
       version: id,
-      maxInputTokens: meta.limit.context,
-      maxOutputTokens: meta.limit.output,
-      maxContextWindowTokens: meta.limit.context,
+      ...tokenLimits(meta.limit.context, meta.limit.output),
       capabilities: { toolCalling: true, imageInput: meta.modalities?.input?.includes('image') === true },
       isBYOK: true,
       configurationSchema: effortSchema(meta),
@@ -36,19 +38,28 @@ function isUsable(meta: MuseMeta | undefined): meta is UsableMeta {
   return Boolean(meta?.limit?.context && meta.limit.output && !meta.is_hidden && meta.tool_call !== false);
 }
 
-// Reasoning effort as an in-picker option, built from the model's own live variants.
-function effortSchema(meta: MuseMeta): object | undefined {
+// Copilot's own BYOK convention: the prompt budget is the window minus the output reservation.
+function tokenLimits(context: number, output: number) {
+  const maxOutputTokens = Math.min(output, context);
+  return { maxContextWindowTokens: context, maxOutputTokens, maxInputTokens: Math.max(0, context - maxOutputTokens) };
+}
+
+// Reasoning effort as an in-picker option, built only from the model's own live variants.
+// Without a live default, 'auto' sends nothing and lets the API decide.
+function effortSchema(meta: MuseMeta): EffortSchema | undefined {
   const variants = Object.entries(meta.variants ?? {});
   if (variants.length === 0) return undefined;
   const efforts = variants.map(([name, variant]) => variant.reasoningEffort ?? name);
+  const labels = variants.map(([name]) => titleCase(name));
+  const liveDefault = efforts.find((effort) => effort === meta.options?.reasoningEffort);
   return {
     properties: {
       reasoningEffort: {
         type: 'string',
         title: 'Reasoning Effort',
-        enum: efforts,
-        enumItemLabels: variants.map(([name]) => titleCase(name)),
-        default: efforts.find((effort) => effort === meta.options?.reasoningEffort) ?? efforts[0],
+        enum: liveDefault ? efforts : ['auto', ...efforts],
+        enumItemLabels: liveDefault ? labels : ['Auto', ...labels],
+        default: liveDefault ?? 'auto',
         group: 'navigation',
       },
     },
