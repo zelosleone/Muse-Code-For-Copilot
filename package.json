@@ -2,7 +2,7 @@
   "name": "muse-code-for-copilot",
   "displayName": "Muse Code: Copilot Provider",
   "description": "Use your Meta Muse Code subscription in GitHub Copilot Chat.",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "type": "module",
   "publisher": "DenizhanDaklr",
   "license": "MIT",
@@ -72,7 +72,7 @@
     "@types/vscode": "^1.118.0",
     "@typescript-eslint/eslint-plugin": "8.53.0",
     "@typescript-eslint/parser": "8.53.0",
-    "@vscode/vsce": "^3.9.1",
+    "@vscode/vsce": "^4.0.0",
     "eslint": "9.39.2",
     "typescript": "5.9.3"
   }

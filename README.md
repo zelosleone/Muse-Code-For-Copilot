@@ -6,7 +6,9 @@ Use your Meta Muse Code subscription in GitHub Copilot Chat. No API key needed.
 2. Pick a Muse model in the Copilot Chat model picker.
 3. Set its reasoning effort right in the picker.
 
-Models and effort levels come live from Meta. Copilot's context window indicator and prompt caching work as usual.
+Models, context windows and effort levels come live from Meta. If Meta doesn't publish a default effort for a model, the picker starts at Auto and lets Meta decide. Copilot's context window indicator and prompt caching work as usual.
+
+**Muse Code: Sign Out** removes the stored session. **Muse Code: Manage** shows who is signed in and can refresh models, sign in or out, or open the logs.
 
 ## Development
 
