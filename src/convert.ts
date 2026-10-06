@@ -15,7 +15,7 @@ interface ToolCall {
 }
 
 interface OpenAIMessage {
-  role: 'user' | 'assistant' | 'tool';
+  role: 'developer' | 'user' | 'assistant' | 'tool';
   content: Content;
   tool_calls?: ToolCall[];
   tool_call_id?: string;
@@ -34,9 +34,13 @@ export interface PendingCall {
   args: string;
 }
 
+// Copilot sends its system prompt with the proposed System role, which the stable typings lack.
+// Meta takes instructions as `developer` (it treats `system` the same, but recommends `developer`).
+const SYSTEM_ROLE = 3 as vscode.LanguageModelChatMessageRole;
+
 export function toOpenAIMessages(message: vscode.LanguageModelChatRequestMessage): OpenAIMessage[] {
   const { texts, images, toolCalls, toolResults } = collect(message.content);
-  const role = message.role === vscode.LanguageModelChatMessageRole.User ? 'user' : 'assistant';
+  const role = roleOf(message.role);
   const content = toContent(texts.join('\n'), images);
   const calls = toolCalls.length > 0 ? { tool_calls: toolCalls } : {};
   const main: OpenAIMessage[] = content !== null || toolCalls.length > 0 ? [{ role, content, ...calls }] : [];
@@ -61,6 +65,11 @@ export function toToolCallParts(calls: Map<number, PendingCall>): vscode.Languag
   return [...calls].map(
     ([index, call]) => new vscode.LanguageModelToolCallPart(call.id ?? `call_${index}`, call.name, parseArgs(call.args)),
   );
+}
+
+function roleOf(role: vscode.LanguageModelChatMessageRole): OpenAIMessage['role'] {
+  if (role === vscode.LanguageModelChatMessageRole.User) return 'user';
+  return role === SYSTEM_ROLE ? 'developer' : 'assistant';
 }
 
 function collect(content: readonly unknown[]): Parts {

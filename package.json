@@ -2,7 +2,7 @@
   "name": "muse-code-for-copilot",
   "displayName": "Muse Code: Copilot Provider",
   "description": "Use your Meta Muse Code subscription in GitHub Copilot Chat.",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "type": "module",
   "publisher": "DenizhanDaklr",
   "license": "MIT",
