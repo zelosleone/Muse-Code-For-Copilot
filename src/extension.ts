@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { Auth } from './auth.js';
+import { scheduleLodestarNotice } from './lodestar.js';
 import { MuseChatProvider } from './provider.js';
 
 const REFRESH_INTERVAL_MS = 30 * 60 * 1000;
@@ -20,6 +21,7 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.commands.registerCommand('museCode.manage', () => manage(auth, provider, log)),
   );
   void provider.refresh();
+  scheduleLodestarNotice(context);
 }
 
 async function manage(auth: Auth, provider: MuseChatProvider, log: vscode.LogOutputChannel): Promise<void> {
