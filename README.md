@@ -2,7 +2,7 @@
 
 Use your Meta Muse Code subscription in GitHub Copilot Chat. No API key needed.
 
-> Also from the same developer: [Lodestar](https://marketplace.visualstudio.com/items?itemName=DenizhanDaklr.lodestar) walks you through how code works and reviews your changes, on any model in VS Code, including this extension's. $10, one time.
+> Also from the same developer: [Lodestar](https://marketplace.visualstudio.com/items?itemName=DenizhanDaklr.lodestar) walks you through how code works, explains anything you hover, and reviews your changes on any model in VS Code, including this extension's. 3 free runs included, then $5 one-time.
 
 1. Run **Muse Code: Sign In** and approve the code in your browser.
 2. Pick a Muse model in the Copilot Chat model picker.
